@@ -1,6 +1,6 @@
 {
-  "name": "mod-tools",
-  "version": "1.0.0",
+  "name": "mod-sample-extractor",
+  "version": "2.0.0",
   "description": "CLI tools for inspecting and extracting data from MOD files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/andormade/mod-tools.git"
+    "url": "git+https://github.com/andorthehood/mod-sample-extractor.git"
   },
   "devDependencies": {
     "@types/node": "^22.15.18",
@@ -36,7 +36,7 @@
   "author": "Andor Polgar",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/andormade/mod-tools/issues"
+    "url": "https://github.com/andorthehood/mod-sample-extractor/issues"
   },
-  "homepage": "https://github.com/andormade/mod-tools#readme"
+  "homepage": "https://github.com/andorthehood/mod-sample-extractor#readme"
 }

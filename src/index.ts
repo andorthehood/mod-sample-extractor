@@ -3,7 +3,9 @@ export {
 	detectChannelCount,
 	extractPatterns,
 	extractSamples,
+	formatEffectsText,
 	formatInspectText,
+	listEffects,
 	parseMod,
 	sanitizeFilename,
 } from './modParser';
@@ -12,6 +14,7 @@ export type {
 	ExtractSamplesResult,
 	InspectData,
 	InspectSampleData,
+	ModEffectUsage,
 	ParsedMod,
 	ParsedModSample,
 } from './modParser';

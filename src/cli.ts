@@ -6,7 +6,9 @@ import {
 	createInspectData,
 	extractPatterns,
 	extractSamples,
+	formatEffectsText,
 	formatInspectText,
+	listEffects,
 	parseMod,
 	sanitizeFilename,
 } from './modParser';
@@ -17,6 +19,8 @@ function printUsage(): void {
 	console.log('Commands:');
 	console.log('  inspect <input.mod>                   Print MOD metadata and sample summary');
 	console.log('  inspect <input.mod> --json            Print MOD metadata as JSON');
+	console.log('  list-effects <input.mod>              Print the list of effects used in the song');
+	console.log('  list-effects <input.mod> --json       Print the list of effects used as JSON');
 	console.log('  extract-samples <input.mod> --output-dir <dir>');
 	console.log('                                       Write raw PCM samples and sample_meta.8f4e');
 	console.log('  extract-patterns <input.mod> --output-dir <dir>');
@@ -93,7 +97,7 @@ async function writePatterns(outputDir: string, parsed: ReturnType<typeof parseM
 	const { buffers, orderTableModule } = extractPatterns(parsed);
 
 	for (let ch = 0; ch < buffers.length; ch++) {
-		const filePath = path.join(outputDir, `patterns_ch${ch}.bin`);
+		const filePath = path.join(outputDir, `patterns_ch${ch + 1}.bin`);
 		await fs.writeFile(filePath, buffers[ch]);
 		process.stderr.write(`Written ${filePath}\n`);
 	}
@@ -119,6 +123,15 @@ async function run(): Promise<void> {
 			return;
 		}
 		process.stdout.write(formatInspectText(parsed, resolvedInput));
+		return;
+	}
+
+	if (command === 'list-effects') {
+		if (json) {
+			process.stdout.write(`${JSON.stringify(listEffects(parsed), null, 2)}\n`);
+			return;
+		}
+		process.stdout.write(formatEffectsText(parsed));
 		return;
 	}
 

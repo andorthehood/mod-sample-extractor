@@ -21,7 +21,7 @@
 
 To install the tool, run:
 ```bash
-npm install -g mod-tools
+npm install -g mod-sample-extractor
 ```
 
 ## Alternate Installation
@@ -30,8 +30,8 @@ In case it has been 10 years and the npm package repository ceased to exist, you
 
 1. Clone the Repository:
   ```bash
-  git clone https://github.com/andormade/mod-tools.git
-  cd mod-tools
+  git clone https://github.com/andorthehood/mod-sample-extractor.git
+  cd mod-sample-extractor
   ```
 
 2. Install 
@@ -62,6 +62,18 @@ Print JSON:
 mod-tools inspect path/to/yourfile.mod --json
 ```
 
+### List Effects
+
+Print the effect commands used in the module:
+```bash
+mod-tools list-effects path/to/yourfile.mod
+```
+
+Print JSON:
+```bash
+mod-tools list-effects path/to/yourfile.mod --json
+```
+
 ### Extract Samples
 
 Write one raw PCM file per non-empty sample plus `sample_meta.8f4e`:
@@ -75,6 +87,7 @@ Write one raw pattern file per channel plus `patterns_order.8f4e`:
 ```bash
 mod-tools extract-patterns path/to/yourfile.mod --output-dir out/patterns
 ```
+Pattern files are named `patterns_ch1.bin`, `patterns_ch2.bin`, and so on.
 
 ### Extract Everything
 

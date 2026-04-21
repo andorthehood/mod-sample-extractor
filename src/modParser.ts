@@ -76,6 +76,49 @@ export interface ExtractSamplesResult {
 	metadataConstants: string;
 }
 
+export interface ModEffectUsage {
+	code: string;
+	name: string;
+	occurrences: number;
+}
+
+const EFFECT_NAMES: Record<number, string> = {
+	0x0: 'Arpeggio',
+	0x1: 'Portamento Up',
+	0x2: 'Portamento Down',
+	0x3: 'Tone Portamento',
+	0x4: 'Vibrato',
+	0x5: 'Tone Portamento + Volume Slide',
+	0x6: 'Vibrato + Volume Slide',
+	0x7: 'Tremolo',
+	0x8: 'Set Panning',
+	0x9: 'Sample Offset',
+	0xa: 'Volume Slide',
+	0xb: 'Position Jump',
+	0xc: 'Set Volume',
+	0xd: 'Pattern Break',
+	0xe: 'Extended',
+	0xf: 'Set Speed / Tempo',
+};
+
+const EXTENDED_EFFECT_NAMES: Record<number, string> = {
+	0x0: 'Set Filter',
+	0x1: 'Fine Portamento Up',
+	0x2: 'Fine Portamento Down',
+	0x3: 'Glissando Control',
+	0x4: 'Set Vibrato Waveform',
+	0x5: 'Set Finetune',
+	0x6: 'Pattern Loop',
+	0x7: 'Set Tremolo Waveform',
+	0x8: 'Karplus-Strong / Retrigger',
+	0x9: 'Retrigger Note',
+	0xa: 'Fine Volume Slide Up',
+	0xb: 'Fine Volume Slide Down',
+	0xc: 'Cut Note',
+	0xd: 'Delay Note',
+	0xe: 'Delay Pattern',
+	0xf: 'Invert Loop',
+};
 export function detectChannelCount(tag: string): number {
 	if (['M.K.', 'M!K!', 'FLT4', '4CHN'].includes(tag)) return 4;
 	if (tag === '6CHN') return 6;
@@ -224,6 +267,76 @@ export function extractSamples(parsed: ParsedMod): ExtractSamplesResult {
 
 	const metadataConstants = `constants sampleMeta\n; @tab 24\n${metadataLines.join('\n')}\n\nconstantsEnd\n`;
 	return { samples, metadataConstants };
+}
+
+function getEffectDescriptor(effectCommand: number, effectParameter: number): { code: string; name: string } | null {
+	if (effectCommand === 0x0 && effectParameter === 0x00) {
+		return null;
+	}
+
+	if (effectCommand === 0x0e) {
+		const subEffect = effectParameter >> 4;
+		const code = `E${subEffect.toString(16).toUpperCase()}`;
+		const name = EXTENDED_EFFECT_NAMES[subEffect] || 'Extended Effect';
+		return { code, name };
+	}
+
+	const code = effectCommand.toString(16).toUpperCase();
+	const name = EFFECT_NAMES[effectCommand] || 'Unknown Effect';
+	return { code, name };
+}
+
+export function listEffects(parsed: ParsedMod): ModEffectUsage[] {
+	const effectCounts = new Map<string, ModEffectUsage>();
+	const bytesPerPattern = ROWS_PER_PATTERN * parsed.channels * BYTES_PER_CELL;
+	const patternSequence = Array.from(new Set(parsed.usedOrderTable));
+
+	for (const patternIndex of patternSequence) {
+		const patternBase = PATTERN_DATA_OFFSET + patternIndex * bytesPerPattern;
+
+		for (let row = 0; row < ROWS_PER_PATTERN; row++) {
+			for (let channelIndex = 0; channelIndex < parsed.channels; channelIndex++) {
+				const cellOffset = patternBase + (row * parsed.channels + channelIndex) * BYTES_PER_CELL;
+				const effectCommand = parsed.buffer[cellOffset + 2] & 0x0f;
+				const effectParameter = parsed.buffer[cellOffset + 3];
+				const descriptor = getEffectDescriptor(effectCommand, effectParameter);
+
+				if (!descriptor) {
+					continue;
+				}
+
+				const existing = effectCounts.get(descriptor.code);
+				if (existing) {
+					existing.occurrences += 1;
+					continue;
+				}
+
+				effectCounts.set(descriptor.code, {
+					code: descriptor.code,
+					name: descriptor.name,
+					occurrences: 1,
+				});
+			}
+		}
+	}
+
+	return Array.from(effectCounts.values()).sort((left, right) => left.code.localeCompare(right.code));
+}
+
+export function formatEffectsText(parsed: ParsedMod): string {
+	const effects = listEffects(parsed);
+	const lines = ['Effects used:'];
+
+	if (effects.length === 0) {
+		lines.push('  (no effects found)');
+		return `${lines.join('\n')}\n`;
+	}
+
+	for (const effect of effects) {
+		lines.push(`  ${effect.code.padEnd(2, ' ')} ${effect.name} (${effect.occurrences})`);
+	}
+
+	return `${lines.join('\n')}\n`;
 }
 
 export function createInspectData(parsed: ParsedMod): InspectData {
