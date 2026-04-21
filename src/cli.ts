@@ -10,7 +10,6 @@ import {
 	formatInspectText,
 	listEffects,
 	parseMod,
-	sanitizeFilename,
 } from './modParser';
 
 function printUsage(): void {
@@ -82,8 +81,7 @@ async function writeSamples(outputDir: string, parsed: ReturnType<typeof parseMo
 	const { samples, metadataConstants } = extractSamples(parsed);
 
 	for (const sample of samples) {
-		const sampleName = sample.name ? `_${sanitizeFilename(sample.name)}` : '';
-		const filePath = path.join(outputDir, `sample_${String(sample.index).padStart(2, '0')}${sampleName}.pcm`);
+		const filePath = path.join(outputDir, `sample_${sample.index}.pcm`);
 		await fs.writeFile(filePath, sample.data);
 		process.stderr.write(`Written ${filePath}\n`);
 	}

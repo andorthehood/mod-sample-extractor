@@ -80,6 +80,7 @@ Write one raw PCM file per non-empty sample plus `sample_meta.8f4e`:
 ```bash
 mod-tools extract-samples path/to/yourfile.mod --output-dir out/samples
 ```
+Sample files are named `sample_1.pcm`, `sample_2.pcm`, and so on.
 
 ### Extract Patterns
 
