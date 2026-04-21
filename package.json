@@ -1,26 +1,42 @@
 {
-  "name": "mod-sample-extractor",
+  "name": "mod-tools",
   "version": "1.0.0",
-  "description": "Extracts PCM samples from MOD files",
-  "main": "index.js",
+  "description": "CLI tools for inspecting and extracting data from MOD files",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "mod-sample-extractor": "index.js"
+    "mod-tools": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/andormade/mod-sample-extractor.git"
+    "url": "git+https://github.com/andormade/mod-tools.git"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "typescript": "^5.8.3"
   },
   "keywords": [
     "mod",
-    "pcm"
+    "pcm",
+    "tracker",
+    "protracker",
+    "cli"
   ],
   "author": "Andor Polgar",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/andormade/mod-sample-extractor/issues"
+    "url": "https://github.com/andormade/mod-tools/issues"
   },
-  "homepage": "https://github.com/andormade/mod-sample-extractor#readme"
+  "homepage": "https://github.com/andormade/mod-tools#readme"
 }

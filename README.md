@@ -1,6 +1,6 @@
-# mod-sample-extractor
+# mod-tools
 
-`mod-sample-extractor` is a Node.js command-line tool for extracting raw PCM sample data from ProTracker MOD files.
+`mod-tools` is a Node.js command-line tool for inspecting and extracting data from ProTracker MOD files.
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@
 
 To install the tool, run:
 ```bash
-npm install -g mod-sample-extractor
+npm install -g mod-tools
 ```
 
 ## Alternate Installation
@@ -30,22 +30,59 @@ In case it has been 10 years and the npm package repository ceased to exist, you
 
 1. Clone the Repository:
   ```bash
-  git clone https://github.com/andormade/mod-sample-extractor.git
-  cd mod-sample-extractor
+  git clone https://github.com/andormade/mod-tools.git
+  cd mod-tools
   ```
 
 2. Install 
   ```bash
-  npm install -g
+  npm install
+  npm run build
+  npm install -g .
   ```
 
-## Usage
+## Development
 
-Once installed, you can run the tool from anywhere:
+Build the publishable JavaScript and type declarations:
 ```bash
-mod-sample-extractor path/to/yourfile.mod
+npm run build
 ```
-The tool reads the provided MOD file, parses the header and sample descriptors, and then extracts the PCM sample data into separate files in the current directory.
+
+## Commands
+
+### Inspect
+
+Print a readable summary:
+```bash
+mod-tools inspect path/to/yourfile.mod
+```
+
+Print JSON:
+```bash
+mod-tools inspect path/to/yourfile.mod --json
+```
+
+### Extract Samples
+
+Write one raw PCM file per non-empty sample plus `sample_meta.8f4e`:
+```bash
+mod-tools extract-samples path/to/yourfile.mod --output-dir out/samples
+```
+
+### Extract Patterns
+
+Write one raw pattern file per channel plus `patterns_order.8f4e`:
+```bash
+mod-tools extract-patterns path/to/yourfile.mod --output-dir out/patterns
+```
+
+### Extract Everything
+
+Run both extraction steps into one directory:
+```bash
+mod-tools extract-all path/to/yourfile.mod --output-dir out/mod
+```
+The tool reads the provided MOD file, parses the header, order table, pattern data, and sample descriptors, then writes the selected outputs.
 
 ## PCM Specification
 
